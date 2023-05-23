@@ -6,3 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.20"
+clap = "3.2.16"
+hound = "3.4.0"
+itertools = "0.10.3"
+pv_leopard = "=1.2.0"
+tabwriter = "1.2.1"

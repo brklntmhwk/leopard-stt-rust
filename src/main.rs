@@ -7,7 +7,7 @@ use std::fs;
 
 fn convert_speech_to_text_by_leopard(
     model_path: Option<&str>,
-    enable_automatic_punctuation: bool,
+    // enable_automatic_punctuation: bool,
     // verbose: bool,
 ) -> std::io::Result<()> {
     let access_key =
@@ -30,7 +30,7 @@ fn convert_speech_to_text_by_leopard(
     }
 
     let leopard: leopard::Leopard = leopard_builder
-        .enable_automatic_punctuation(enable_automatic_punctuation)
+        // .enable_automatic_punctuation(enable_automatic_punctuation)
         .access_key(access_key)
         .init()
         .expect("Failed to create Leopard");
@@ -78,12 +78,12 @@ fn main() {
                 .help("Path to the file containing model parameter.")
                 .takes_value(true),
         )
-        .arg(
-            Arg::with_name("disable_automatic_punctuation")
-                .long("disable_automatic_punctuation")
-                .short('d')
-                .help("Set to disable automatic punctuation insertion."),
-        )
+        // .arg(
+        //     Arg::with_name("disable_automatic_punctuation")
+        //         .long("disable_automatic_punctuation")
+        //         .short('d')
+        //         .help("Set to disable automatic punctuation insertion."),
+        // )
         // .arg(
         //     Arg::with_name("verbose")
         //         .long("verbose")
@@ -94,10 +94,12 @@ fn main() {
 
     let model_path: Option<&str> = matches.value_of("model_path");
 
-    let enable_automatic_punctuation: bool = !matches.contains_id("disable_automatic_punctuation");
+    // let enable_automatic_punctuation: bool = !matches.contains_id("disable_automatic_punctuation");
 
     // let verbose: bool = matches.contains_id("verbose");
 
-    convert_speech_to_text_by_leopard(model_path, enable_automatic_punctuation /* verbose */)
-        .unwrap();
+    convert_speech_to_text_by_leopard(
+        model_path, /* enable_automatic_punctuation */ /* verbose */
+    )
+    .unwrap();
 }

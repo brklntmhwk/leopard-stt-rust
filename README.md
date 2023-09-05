@@ -6,10 +6,12 @@ The code inside this repo mostly refers to
 - https://github.com/Picovoice/leopard
 
 ## Prerequisites
-
-- Sign up for Picovoice
-  - https://console.picovoice.ai/
-  - In your dashboard, copy your accesskey
+- You have already
+  - installed Rust dev environment on your local machine
+    - https://www.rust-lang.org/ja/tools/install
+  - signed up for Picovoice
+    - https://console.picovoice.ai/
+    - In your dashboard, copy your accesskey
 
 ## How to use
 

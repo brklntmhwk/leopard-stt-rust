@@ -1,16 +1,28 @@
-use std::io::Write;
-use std::path::PathBuf;
 use clap::{App, Arg};
+use dotenv;
 use leopard::LeopardBuilder;
-use tabwriter::TabWriter;
+use std::fs;
+// use std::io::Write;
+// use tabwriter::TabWriter;
 
-fn leopard_demo(
-    input_audio_path: PathBuf,
-    access_key: &str,
+fn convert_speech_to_text_by_leopard(
     model_path: Option<&str>,
     enable_automatic_punctuation: bool,
-    verbose: bool,
-) {
+    // verbose: bool,
+) -> std::io::Result<()> {
+    let access_key =
+        dotenv::var("ACCESS_KEY").expect("AccessKey is REQUIRED for Leopard operation");
+
+    println!("access_key: {}", access_key);
+
+    let audio_files = fs::read_dir("./audio")?
+        .map(|res| res.map(|e| e.path()))
+        .collect::<Result<Vec<_>, std::io::Error>>()
+        .unwrap();
+
+    let audio_file = &audio_files[0];
+    println!("audio file path: {}", audio_file.display().to_string());
+
     let mut leopard_builder: LeopardBuilder = LeopardBuilder::new();
 
     if let Some(model_path) = model_path {
@@ -23,46 +35,41 @@ fn leopard_demo(
         .init()
         .expect("Failed to create Leopard");
 
-    let leopard_transcript: leopard::LeopardTranscript = leopard.process_file(input_audio_path).unwrap();
+    let leopard_transcript: leopard::LeopardTranscript = leopard.process_file(audio_file).unwrap();
+    println!("---------------");
     println!("{}", leopard_transcript.transcript);
-    if verbose {
-        println!();
-        let mut tw: TabWriter<Vec<u8>> = TabWriter::new(vec![]);
-        writeln!(&mut tw, "Word\tStart Sec\tEnd Sec\tConfidence").unwrap();
-        writeln!(&mut tw, "----\t---------\t-------\t----------").unwrap();
-        leopard_transcript.words.iter().for_each(|word: &leopard::LeopardWord| {
-            writeln!(
-                &mut tw,
-                "{}\t{:.2}\t{:.2}\t{:.2}",
-                word.word, word.start_sec, word.end_sec, word.confidence
-            )
-            .unwrap();
-        });
-        tw.flush().unwrap();
-        println!("{}", String::from_utf8(tw.into_inner().unwrap()).unwrap());
-    }
+    println!("---------------");
+
+    // if verbose {
+    //     println!();
+    //     let mut tw: TabWriter<Vec<u8>> = TabWriter::new(vec![]);
+    //     writeln!(&mut tw, "Word\tStart Sec\tEnd Sec\tConfidence").unwrap();
+    //     writeln!(&mut tw, "----\t---------\t-------\t----------").unwrap();
+    //     leopard_transcript
+    //         .words
+    //         .iter()
+    //         .for_each(|word: &leopard::LeopardWord| {
+    //             writeln!(
+    //                 &mut tw,
+    //                 "{}\t{:.2}\t{:.2}\t{:.2}",
+    //                 word.word, word.start_sec, word.end_sec, word.confidence
+    //             )
+    //             .unwrap();
+    //         });
+    //     tw.flush().unwrap();
+    //     println!("{}", String::from_utf8(tw.into_inner().unwrap()).unwrap());
+    // }
+
+    fs::write(
+        "output.txt",
+        leopard_transcript.transcript.replace(". ", ".\n"),
+    )?;
+
+    Ok(())
 }
 
 fn main() {
     let matches: clap::ArgMatches = App::new("Picovoice Leopard Rust File Demo")
-        .arg(
-            Arg::with_name("input_audio_path")
-                .long("input_audio_path")
-                .short('i')
-                .value_name("PATH")
-                .help("Path to input audio file (mono, WAV, 16-bit, 16kHz).")
-                .takes_value(true)
-                .required(true),
-        )
-        .arg(
-            Arg::with_name("access_key")
-                .long("access_key")
-                .short('a')
-                .value_name("ACCESS_KEY")
-                .help("AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)")
-                .takes_value(true)
-                .required(true),
-        )
         .arg(
             Arg::with_name("model_path")
                 .long("model_path")
@@ -77,32 +84,20 @@ fn main() {
                 .short('d')
                 .help("Set to disable automatic punctuation insertion."),
         )
-        .arg(
-            Arg::with_name("verbose")
-                .long("verbose")
-                .short('v')
-                .help("Set to enable printing of word metadata."),
-        )
+        // .arg(
+        //     Arg::with_name("verbose")
+        //         .long("verbose")
+        //         .short('v')
+        //         .help("Set to enable printing of word metadata."),
+        // )
         .get_matches();
-
-    let input_audio_path: PathBuf = PathBuf::from(matches.value_of("input_audio_path").unwrap());
-
-    let access_key: &str = matches
-        .value_of("access_key")
-        .expect("AccessKey is REQUIRED for Leopard operation");
 
     let model_path: Option<&str> = matches.value_of("model_path");
 
     let enable_automatic_punctuation: bool = !matches.contains_id("disable_automatic_punctuation");
 
-    let verbose: bool = matches.contains_id("verbose");
+    // let verbose: bool = matches.contains_id("verbose");
 
-    leopard_demo(
-        input_audio_path,
-        access_key,
-        model_path,
-        enable_automatic_punctuation,
-        verbose,
-    );
-
+    convert_speech_to_text_by_leopard(model_path, enable_automatic_punctuation /* verbose */)
+        .unwrap();
 }

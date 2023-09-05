@@ -30,4 +30,4 @@ git clone https://github.com/brklntmhwk/leopard-stt-rust.git
 cargo run
 ```
 
-5. the resultant text file is created as output.txt
+5. The resultant text file is created as output.txt

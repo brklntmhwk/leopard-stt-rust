@@ -1,5 +1,4 @@
 target/
 .vscode
-audio
 *.txt
 .env

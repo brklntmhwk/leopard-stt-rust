@@ -19,13 +19,13 @@ The code inside this repo mostly refers to
 ```
 git clone https://github.com/brklntmhwk/leopard-stt-rust.git
 ```
-2. Open it
+2. Open it in a code editor
 
-3. Create .env file in the project root and paste your accesskey as ACCESS_KEY in .env
-  - Refer to .env.example
+3. Create ```.env``` file in the project root and paste your accesskey as ACCESS_KEY in ```.env```
+  - Refer to ```.env.example```
 
 4. Put an audio file (mp3, etc..) in audio/ directory
-  - you could put multiple files, but the first one is supposed to be read
+  - you could put multiple files, but only the first one is supposed to be read in an alphabetical order
 
 5. Build & run this binary project
 ```
